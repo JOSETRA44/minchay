@@ -1,0 +1,157 @@
+---
+import { pasos } from '../../domain/servicio';
+---
+<section class="section process" aria-labelledby="funcionamiento" data-process>
+  <div class="wrap">
+    <h2 id="funcionamiento">Cómo funciona</h2>
+    <div class="process-scene">
+      <div class="process-stage" aria-hidden="true">
+        <div class="process-perspective">
+          <div class="process-box" data-process-box>
+            <div class="box-face box-front"><span class="box-logo">minchay<span>.</span></span></div>
+            <div class="box-face box-right"><span>Cocinado<br />en tandas.</span></div>
+            <div class="box-face box-back"><span>En<br />camino.</span></div>
+            <div class="box-face box-left"></div>
+            <div class="box-face box-top"></div>
+          </div>
+        </div>
+      </div>
+      <ol class="process-steps numbered" role="list">
+        {pasos.map(({ titulo, texto }) => (
+          <li data-process-step>
+            <h3>{titulo}</h3>
+            <p>{texto}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
+</section>
+
+<script>
+  const section = document.querySelector<HTMLElement>('[data-process]');
+  const box = section?.querySelector<HTMLElement>('[data-process-box]');
+  const steps = [...(section?.querySelectorAll<HTMLElement>('[data-process-step]') ?? [])];
+
+  if (section && box && steps.length > 1) {
+    section.setAttribute('data-box-motion', '');
+    const wide = matchMedia('(min-width: 56rem)');
+    const clamp = (value: number) => Math.max(0, Math.min(1, value));
+    let request = 0;
+
+    const update = () => {
+      request = 0;
+      const bounds = section.getBoundingClientRect();
+      if (bounds.bottom < 0 || bounds.top > innerHeight) return;
+      const line = innerHeight * (wide.matches ? .5 : .7);
+      const centers = steps.map((step) => {
+        const { top, height } = step.getBoundingClientRect();
+        return top + height / 2;
+      });
+      const angle = centers.slice(1).reduce((sum, following, index) => {
+        const leading = centers[index];
+        const interval = following - leading;
+        const t = clamp((line - leading - interval * .22) / Math.max(1, interval * .56));
+        return sum - 90 * t * t * (3 - 2 * t);
+      }, 0);
+      box.style.setProperty('--box-turn', `${angle.toFixed(2)}deg`);
+    };
+
+    const queueUpdate = () => {
+      if (!request) request = requestAnimationFrame(update);
+    };
+    addEventListener('scroll', queueUpdate, { passive: true });
+    addEventListener('resize', queueUpdate);
+    queueUpdate();
+  }
+</script>
+
+<style>
+  .process { background: #f4eadd; }
+  .process h2 { margin-block-end: clamp(1.5rem, 5vw, 4.25rem); }
+  .process-stage { display: none; }
+  .process-steps { padding: 0; }
+  .process-steps li { padding-block: clamp(1.5rem, 4vw, 3rem); border-block-start: 1px solid #cbb6a5; }
+  .process-steps li::before { margin-block-end: .75rem; }
+  .process-steps h3 { font-size: clamp(2rem, 4.65vw, 5rem); text-wrap: initial; }
+  .process-steps p { margin-block-start: .8rem; max-inline-size: 34ch; }
+
+  .process[data-box-motion] .process-stage {
+    --box-size: clamp(7rem, 37vw, 12.5rem);
+    --box-depth: calc(var(--box-size) / 2);
+    --box-height: calc(var(--box-size) * .74);
+    display: grid;
+    place-items: center;
+    position: sticky;
+    z-index: 1;
+    inset-block-start: 0;
+    block-size: clamp(10rem, 33svh, 17rem);
+    background: #f4eadd;
+    border-block-end: 1px solid #cbb6a5;
+  }
+  .process-perspective {
+    position: relative;
+    display: grid;
+    place-items: center;
+    inline-size: 100%;
+    block-size: 100%;
+    perspective: clamp(32rem, 76vw, 90rem);
+  }
+  .process-perspective::before {
+    content: "";
+    position: absolute;
+    inline-size: calc(var(--box-size) * 1.15);
+    block-size: calc(var(--box-size) * .13);
+    inset-block-start: 78%;
+    background: radial-gradient(ellipse, #4a261c38, transparent 70%);
+  }
+  .process-box {
+    position: relative;
+    inline-size: var(--box-size);
+    block-size: var(--box-height);
+    transform-style: preserve-3d;
+    transform: translateZ(calc(var(--box-depth) * -1)) rotateX(-14deg) rotateY(calc(var(--box-turn, 0deg) + 16deg));
+  }
+  .box-face {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    border: 1px solid #20171366;
+    backface-visibility: hidden;
+    color: #f4eadd;
+    background: #6b6e46;
+    font: 600 calc(var(--box-size) * .15)/.93 var(--serif);
+    letter-spacing: -.05em;
+    text-align: center;
+  }
+  .box-front { transform: translateZ(var(--box-depth)); background: #edd3ad; color: var(--ink); }
+  .box-logo { font-size: 1.65em; letter-spacing: -.085em; }
+  .box-logo span { color: var(--accent); }
+  .box-right { transform: rotateY(90deg) translateZ(var(--box-depth)); background: #a8381a; }
+  .box-back { transform: rotateY(180deg) translateZ(var(--box-depth)); }
+  .box-left { transform: rotateY(-90deg) translateZ(var(--box-depth)); background: #c49e75; }
+  .box-top {
+    inset-block-start: 50%;
+    inline-size: var(--box-size);
+    block-size: var(--box-size);
+    margin-block-start: calc(var(--box-depth) * -1);
+    background: repeating-linear-gradient(90deg, #e4c29a 0 49.5%, #ad815b 49.5% 50.5%, #e4c29a 50.5% 100%);
+    transform: rotateX(90deg) translateZ(calc(var(--box-height) / 2));
+  }
+
+  .process[data-box-motion] .process-steps li { display: flex; flex-direction: column; justify-content: center; min-block-size: max(14rem, 43svh); }
+
+  @media (min-width: 56rem) {
+    .process-scene { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .85fr); gap: clamp(2rem, 7vw, 8rem); }
+    .process:not([data-box-motion]) .process-scene { display: block; }
+    .process[data-box-motion] .process-stage {
+      --box-size: clamp(14rem, 31vw, 30rem);
+      align-self: start;
+      inset-block-start: 13svh;
+      block-size: 63svh;
+      border-block: 1px solid #cbb6a5;
+    }
+    .process[data-box-motion] .process-steps li { min-block-size: max(18rem, 52svh); }
+  }
+</style>

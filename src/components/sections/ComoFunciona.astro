@@ -2,17 +2,17 @@
 import { pasos } from '../../domain/servicio';
 import Reveal from '../ui/Reveal.astro';
 import SectionHeading from '../ui/SectionHeading.astro';
+import ProcessCube from '../ui/ProcessCube.astro';
 interface Props { standalone?: boolean }
 const { standalone = false } = Astro.props;
-const StepHeading = standalone ? 'h2' : 'h3';
 ---
-<section class:list={['section', { 'page-intro': standalone }]} aria-labelledby="funcionamiento">
+{standalone ? <section class="section page-intro" aria-labelledby="funcionamiento">
   <div class="wrap">
-    <SectionHeading id="funcionamiento" title="Cómo funciona" level={standalone ? 1 : 2} />
+    <SectionHeading id="funcionamiento" title="Cómo funciona" level={1} />
     <Reveal>
       <ol class="editorial-grid numbered" role="list">
-        {pasos.map(({ titulo, texto }) => <li><StepHeading>{titulo}</StepHeading><p>{texto}</p></li>)}
+        {pasos.map(({ titulo, texto }) => <li><h2>{titulo}</h2><p>{texto}</p></li>)}
       </ol>
     </Reveal>
   </div>
-</section>
+</section> : <ProcessCube />}

@@ -23,8 +23,9 @@
   if (intro) {
     const done = () => { intro.remove(); root.classList.remove('has-intro'); };
     if (!root.classList.contains('has-intro')) intro.remove();
-    else setTimeout(done, 1550);
+    else setTimeout(done, 1450);
   }
+  setTimeout(() => root.classList.remove('has-hero-entry'), 2200);
 
   {
     // Barrido de franjas sobre las fotos al entrar en pantalla.
@@ -42,32 +43,62 @@
       photos.forEach((photo) => photo.classList.add('in'));
     }
 
-    // Carrusel del hero: cada 5,2 s las franjas cubren la foto, cambia el
-    // plato y las franjas se retiran. Se pausa al pasar el cursor y con la
-    // pestaña oculta. Es la firma de movimiento de la referencia.
+    // Conserva la foto anterior hasta que la entrante termina de revelarse.
     const carousel = document.querySelector('[data-carousel]');
     if (carousel) {
-      const slides = [...carousel.querySelectorAll('[data-carousel-slide]')];
-      const dots = [...document.querySelectorAll('[data-carousel-dot]')];
+      const slides = [...carousel.querySelectorAll<HTMLImageElement>('[data-carousel-slide]')];
+      const dots = [...carousel.querySelectorAll<HTMLButtonElement>('[data-carousel-dot]')];
+      const controls = carousel.querySelector<HTMLElement>('[data-carousel-controls]');
+      const toggle = carousel.querySelector<HTMLButtonElement>('[data-carousel-toggle]');
       let current = 0;
       let paused = false;
-      const cycle = () => {
-        if (paused || document.hidden || slides.length < 2) return;
-        carousel.classList.add('wiping');
-        setTimeout(() => {
+      let changing = false;
+      let hovering = false;
+
+      const show = async (index: number) => {
+        if (changing || index === current) return;
+        changing = true;
+        const next = slides[index];
+        next.loading = 'eager';
+        try {
+          await next.decode();
+          next.classList.add('entering');
+          await new Promise<void>((resolve) => {
+            requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+          });
+          await Promise.allSettled(next.getAnimations().map((animation) => animation.finished));
           slides[current].classList.remove('active');
-          dots[current]?.classList.remove('active');
-          current = (current + 1) % slides.length;
-          slides[current].classList.add('active');
-          dots[current]?.classList.add('active');
-          carousel.classList.remove('wiping');
-          carousel.classList.add('lifting');
-          setTimeout(() => carousel.classList.remove('lifting'), 750);
-        }, 620);
+          slides[current].setAttribute('aria-hidden', 'true');
+          dots[current]?.removeAttribute('aria-current');
+          next.classList.replace('entering', 'active');
+          next.removeAttribute('aria-hidden');
+          dots[index]?.setAttribute('aria-current', 'true');
+          current = index;
+        } catch {
+          // Una imagen que no carga deja la anterior a la vista.
+        } finally {
+          changing = false;
+        }
       };
-      setInterval(cycle, 5200);
-      carousel.addEventListener('mouseenter', () => { paused = true; });
-      carousel.addEventListener('mouseleave', () => { paused = false; });
+
+      if (slides.length > 1 && controls) {
+        controls.hidden = false;
+        dots.forEach((dot, index) => dot.addEventListener('click', () => { void show(index); }));
+        toggle?.addEventListener('click', () => {
+          paused = !paused;
+          toggle.setAttribute('aria-label', paused ? 'Reanudar cambio automático de fotos' : 'Pausar cambio automático de fotos');
+          const icon = toggle.querySelector('span');
+          if (icon) icon.textContent = paused ? '▶' : 'Ⅱ';
+        });
+        carousel.querySelector('.hero-photo')?.addEventListener('mouseenter', () => { hovering = true; });
+        carousel.querySelector('.hero-photo')?.addEventListener('mouseleave', () => { hovering = false; });
+        setInterval(() => {
+          if (paused || hovering || document.hidden || carousel.matches(':focus-within')) return;
+          const { top, bottom } = carousel.getBoundingClientRect();
+          if (bottom <= 0 || top >= innerHeight) return;
+          void show((current + 1) % slides.length);
+        }, 5200);
+      }
     }
 
     // Scroll: cabecera con sombra, manifiesto frase a frase ligado al
@@ -78,20 +109,54 @@
     const puntos = manifiesto ? [...manifiesto.querySelectorAll('[data-punto]')] : [];
     manifiesto?.classList.add('activo');
     const parallaxImages = [...document.querySelectorAll('img[data-parallax]')];
+    const story = document.querySelector<HTMLElement>('[data-day-story]');
+    const cinematicLayout = matchMedia('(min-width: 54rem) and (min-height: 34rem)');
+    const meals = Array.from(story?.querySelectorAll('[data-day-meal]') ?? []);
+    const frames = Array.from(story?.querySelectorAll<HTMLImageElement>('[data-day-frame]') ?? []).slice(1);
+    const meter = story?.querySelector<HTMLElement>('[data-day-meter]');
+    const clamp = (value: number) => Math.min(1, Math.max(0, value));
+
+    function updateDayStory() {
+      if (!story || !cinematicLayout.matches || !meals.length) return;
+      const bounds = story.getBoundingClientRect();
+      if (bounds.bottom < 0 || bounds.top > innerHeight) return;
+
+      const center = innerHeight * .49;
+      const positions = meals.map((meal) => {
+        const { top, height } = meal.getBoundingClientRect();
+        return top + height / 2;
+      });
+      const distance = positions[positions.length - 1] - positions[0];
+      const progress = distance > 0 ? clamp((center - positions[0]) / distance) : 0;
+      meter?.style.setProperty('transform', `scaleX(${progress})`);
+
+      frames.forEach((frame, index) => {
+        const midpoint = (positions[index] + positions[index + 1]) / 2;
+        const blend = clamp(.5 + (center - midpoint) / (innerHeight * .32));
+        frame.style.opacity = String(blend);
+        frame.style.transform = `scale(${1 + (1 - blend) * .065})`;
+      });
+    }
+
     let ticking = false;
     const update = () => {
       ticking = false;
       header?.classList.toggle('scrolled', window.scrollY > 12);
       if (manifiesto && frases.length) {
         const rect = manifiesto.getBoundingClientRect();
-        const travel = manifiesto.offsetHeight - window.innerHeight;
-        const progress = travel > 0 ? Math.min(1, Math.max(0, -rect.top / travel)) : 1;
-        const actual = Math.min(frases.length - 1, Math.floor(progress * frases.length));
+        const travel = rect.height - innerHeight;
+        const progress = travel > 0 ? clamp(-rect.top / travel) : 1;
+        const position = progress * frases.length;
+        const actual = Math.min(frases.length - 1, Math.floor(position));
+        manifiesto.classList.toggle('en-pantalla', rect.top < innerHeight && rect.bottom > 0);
+        manifiesto.style.setProperty('--avance', String(progress));
         frases.forEach((frase, i) => {
           frase.classList.toggle('on', i === actual);
           frase.classList.toggle('past', i < actual);
         });
-        puntos.forEach((punto, i) => punto.classList.toggle('on', i === actual));
+        puntos.forEach((punto, i) => {
+          (punto as HTMLElement).style.setProperty('--avance-frase', String(clamp(position - i)));
+        });
       }
       for (const img of parallaxImages) {
         const box = img.parentElement?.getBoundingClientRect();
@@ -99,10 +164,21 @@
         const offset = (box.top + box.height / 2 - window.innerHeight / 2) * -0.045;
         img.style.transform = `translateY(${offset.toFixed(1)}px) scale(1.14)`;
       }
+      updateDayStory();
     };
-    addEventListener('scroll', () => {
+    const queueUpdate = () => {
       if (!ticking) { ticking = true; requestAnimationFrame(update); }
-    }, { passive: true });
+    };
+    addEventListener('scroll', queueUpdate, { passive: true });
+    addEventListener('resize', queueUpdate);
+    if (story) {
+      const syncLayout = () => {
+        story.toggleAttribute('data-cinematic', cinematicLayout.matches);
+        queueUpdate();
+      };
+      cinematicLayout.addEventListener('change', syncLayout);
+      syncLayout();
+    }
     update();
   }
 </script>
