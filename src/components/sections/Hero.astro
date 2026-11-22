@@ -12,12 +12,19 @@ import { site, ruta } from '../../lib/site';
       <a class="text-link" href={ruta('/como-funciona/')}>Ver cómo funciona <span aria-hidden="true">↗</span></a>
     </div>
   </div>
-  <div>
-    <div class="photo hero-photo" data-carousel>
-      {heroSlides.map((slide, i) => <img {...slide} class:list={['slide', { active: i === 0 }]} data-carousel-slide loading={i === 0 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : undefined} decoding="async" />)}
+  <div class="hero-reel" data-carousel>
+    <div class="photo hero-photo" id="hero-photos">
+      {heroSlides.map(({ src, alt, width, height }, i) => (
+        <img src={src} alt={alt} width={width} height={height} class={i === 0 ? 'slide active' : 'slide'} data-carousel-slide aria-hidden={i === 0 ? undefined : 'true'} loading={i === 0 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : undefined} />
+      ))}
       <span class="wipe" aria-hidden="true">{[0, 1, 2, 3, 4].map((i) => <i style={`--d:${(i * 0.06).toFixed(2)}s`}></i>)}</span>
     </div>
-    <p class="scroll-hint" aria-hidden="true"><i></i>Desliza</p>
-    <div class="carousel-dots" aria-hidden="true">{heroSlides.map((_, i) => <span class:list={['dot-seg', { active: i === 0 }]} data-carousel-dot></span>)}</div>
+    <a class="scroll-hint" href="#horarios"><i aria-hidden="true"></i>Desliza</a>
+    <div class="carousel-dots" data-carousel-controls hidden>
+      {heroSlides.map((_, i) => (
+        <button type="button" class="dot-seg" aria-controls="hero-photos" aria-current={i === 0 ? 'true' : undefined} aria-label={`Ver foto ${i + 1}`} data-carousel-dot><span></span></button>
+      ))}
+      <button class="carousel-toggle" type="button" aria-label="Pausar cambio automático de fotos" data-carousel-toggle><span aria-hidden="true">Ⅱ</span></button>
+    </div>
   </div>
 </section>

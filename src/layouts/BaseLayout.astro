@@ -22,7 +22,7 @@ const schema = structuredData(page, base);
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script is:inline>try{document.documentElement.classList.add('has-intro')}catch(e){}</script>
+    <script is:inline>if (!location.hash) document.documentElement.classList.add('has-intro', 'has-hero-entry');</script>
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical.href} />
