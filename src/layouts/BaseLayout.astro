@@ -22,7 +22,7 @@ const schema = structuredData(page, base);
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script is:inline>try{if(!sessionStorage.getItem('minchay-intro')&&!matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('has-intro');sessionStorage.setItem('minchay-intro','1')}}catch(e){}</script>
+    <script is:inline>try{if(!matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('has-intro')}}catch(e){}</script>
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical.href} />

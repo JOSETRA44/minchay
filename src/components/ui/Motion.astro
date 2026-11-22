@@ -43,6 +43,34 @@
       photos.forEach((photo) => photo.classList.add('in'));
     }
 
+    // Carrusel del hero: cada 5,2 s las franjas cubren la foto, cambia el
+    // plato y las franjas se retiran. Se pausa al pasar el cursor y con la
+    // pestaña oculta. Es la firma de movimiento de la referencia.
+    const carousel = document.querySelector('[data-carousel]');
+    if (carousel) {
+      const slides = [...carousel.querySelectorAll('[data-carousel-slide]')];
+      const dots = [...document.querySelectorAll('[data-carousel-dot]')];
+      let current = 0;
+      let paused = false;
+      const cycle = () => {
+        if (paused || document.hidden || slides.length < 2) return;
+        carousel.classList.add('wiping');
+        setTimeout(() => {
+          slides[current].classList.remove('active');
+          dots[current]?.classList.remove('active');
+          current = (current + 1) % slides.length;
+          slides[current].classList.add('active');
+          dots[current]?.classList.add('active');
+          carousel.classList.remove('wiping');
+          carousel.classList.add('lifting');
+          setTimeout(() => carousel.classList.remove('lifting'), 750);
+        }, 620);
+      };
+      setInterval(cycle, 5200);
+      carousel.addEventListener('mouseenter', () => { paused = true; });
+      carousel.addEventListener('mouseleave', () => { paused = false; });
+    }
+
     // Scroll: cabecera con sombra, fundido ligado al scroll en «Pasado mañana»
     // y parallax leve en las fotos marcadas. Un solo handler con rAF.
     const header = document.querySelector('.site-header');

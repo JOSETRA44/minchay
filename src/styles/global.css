@@ -233,3 +233,24 @@
     html.has-intro .hero * { animation: none !important; }
   }
 }
+
+@layer motion {
+  /* ——— Carrusel del hero: el barrido de franjas es su transición, como en la referencia ——— */
+  .hero-photo .slide { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; object-fit: cover; opacity: 0; }
+  .hero-photo .slide.active { opacity: 1; }
+  .hero-photo.wiping .wipe i { transform: scaleY(1); transform-origin: top; transition: transform .42s cubic-bezier(.7, 0, .2, 1); transition-delay: var(--d, 0s); }
+  .hero-photo.lifting .wipe i { transform: scaleY(0); transform-origin: bottom; transition: transform .55s cubic-bezier(.7, 0, .2, 1); transition-delay: var(--d, 0s); }
+  .carousel-dots { display: flex; gap: .5rem; margin-block-start: .9rem; }
+  .dot-seg { inline-size: 2.6rem; block-size: .28rem; background: var(--line); transition: background .3s ease; }
+  .dot-seg.active { background: var(--accent); }
+
+  /* Revelados más largos y profundos: que el movimiento se vea, no se intuya */
+  [data-reveal] { transition-duration: .8s, .95s, .95s; }
+  .reveal-pending:not(:focus-within) { transform: translateY(2.6rem); }
+  .reveal-pending :is(.editorial-grid > *, .place-list li) { transform: translateY(1.6rem); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-photo .slide { transition: none; }
+    .dot-seg { transition: none; }
+  }
+}

@@ -7,3 +7,9 @@ export const fotos = {
   hero: { src: `${basePath}/images/hero.jpg`, alt: 'Cuenco de ensalada con verduras variadas visto desde arriba', width: 1600, height: 1600 },
   menu: { src: `${basePath}/images/menu.jpg`, alt: 'Tostadas de aguacate con semillas servidas en un plato', width: 1600, height: 1064 },
 } as const;
+
+export const heroSlides = [
+  fotos.hero,
+  { src: `${basePath}/images/plato.jpg`, alt: 'Bol de verduras asadas con granos y hojas verdes', width: 1600, height: 1067 },
+  fotos.menu,
+] as const;
