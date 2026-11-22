@@ -3,14 +3,16 @@ import { fotos } from '../../domain/fotos';
 import { site, ruta } from '../../lib/site';
 import EditorialPhoto from '../ui/EditorialPhoto.astro';
 ---
-<section class="hero wrap" aria-labelledby="hero-title">
+<section class="hero ruled" aria-labelledby="hero-title">
   <div class="hero-copy">
     <p class="eyebrow"><span class="dot"></span> En fase de lanzamiento</p>
     <h1 id="hero-title">La comida de toda tu semana, <em>resuelta hoy.</em></h1>
-    <p class="lead">{site.subtitle}</p>
-    <div class="actions">
+    <div class="hero-meta">
+      <p class="lead">{site.subtitle}</p>
+      <div class="actions">
       <a class="button" href={site.waitlist}>{site.cta} <span aria-hidden="true">↗</span></a>
-      <a class="text-link" href={ruta('/como-funciona/')}>Ver cómo funciona <span aria-hidden="true">↗</span></a>
+        <a class="text-link" href={ruta('/como-funciona/')}>Ver cómo funciona <span aria-hidden="true">↗</span></a>
+      </div>
     </div>
   </div>
   <EditorialPhoto photo={fotos.hero} eager />

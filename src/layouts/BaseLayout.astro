@@ -1,7 +1,9 @@
 ---
 import '@fontsource/archivo/latin-400.css';
 import '@fontsource/archivo/latin-600.css';
-import '@fontsource/fraunces/latin-600.css';
+import '@fontsource/archivo/latin-700.css';
+import '@fontsource/archivo/latin-800.css';
+import '@fontsource/archivo/latin-900.css';
 import '../styles/global.css';
 import Header from '../components/layout/Header.astro';
 import Footer from '../components/layout/Footer.astro';
@@ -25,7 +27,7 @@ const schema = structuredData(page, base);
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical.href} />
     <link rel="icon" href={ruta('/favicon.svg')} type="image/svg+xml" />
-    <meta name="theme-color" content="#FAF5EE" />
+    <meta name="theme-color" content="#0B0B0B" />
     <meta name="robots" content={page === 'error' ? 'noindex, follow' : 'index, follow'} />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.name} />

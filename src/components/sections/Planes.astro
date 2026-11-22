@@ -7,7 +7,7 @@ interface Props { standalone?: boolean }
 const { standalone = false } = Astro.props;
 const PlanHeading = standalone ? 'h2' : 'h3';
 ---
-<section class:list={['section plans-section', { 'page-intro': standalone }]} aria-labelledby="planes-title">
+<section class:list={['section plans-section ruled', { 'page-intro': standalone }]} aria-labelledby="planes-title">
   <div class="wrap">
     <SectionHeading id="planes-title" title="Planes de suscripción" level={standalone ? 1 : 2}>
       <p>Elige qué comidas quieres recibir y dónde encajan en tu semana.</p>
