@@ -1,6 +1,6 @@
 import { faqs } from '../domain/faqs';
 import { planes } from '../domain/planes';
-import { site } from './site';
+import { site, ruta } from './site';
 
 export const metadata = {
   home: {
@@ -33,7 +33,7 @@ export const metadata = {
 export type Page = keyof typeof metadata;
 
 export function structuredData(page: Page, base: URL) {
-  const url = (path: string) => new URL(path, base).href;
+  const url = (path: string) => new URL(ruta(path), base).href;
   const context = 'https://schema.org';
   const organizationId = url('/#organizacion');
 

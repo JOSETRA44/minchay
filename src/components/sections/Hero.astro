@@ -1,6 +1,6 @@
 ---
 import { fotos } from '../../domain/fotos';
-import { site } from '../../lib/site';
+import { site, ruta } from '../../lib/site';
 import EditorialPhoto from '../ui/EditorialPhoto.astro';
 ---
 <section class="hero wrap" aria-labelledby="hero-title">
@@ -10,7 +10,7 @@ import EditorialPhoto from '../ui/EditorialPhoto.astro';
     <p class="lead">{site.subtitle}</p>
     <div class="actions">
       <a class="button" href={site.waitlist}>{site.cta} <span aria-hidden="true">↗</span></a>
-      <a class="text-link" href="/como-funciona/">Ver cómo funciona <span aria-hidden="true">↗</span></a>
+      <a class="text-link" href={ruta('/como-funciona/')}>Ver cómo funciona <span aria-hidden="true">↗</span></a>
     </div>
   </div>
   <EditorialPhoto photo={fotos.hero} eager />

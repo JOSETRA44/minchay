@@ -1,10 +1,10 @@
 ---
-import { site } from '../../lib/site';
+import { site, ruta } from '../../lib/site';
 ---
 <footer class="site-footer">
   <div class="wrap footer-inner">
     <div>
-      <a class="wordmark" href="/" aria-label="Minchay, inicio">minchay<span aria-hidden="true">.</span></a>
+      <a class="wordmark" href={ruta('/')} aria-label="Minchay, inicio">minchay<span aria-hidden="true">.</span></a>
       <p>Comida casera por suscripción.</p>
     </div>
     <nav aria-label="Pie de página">

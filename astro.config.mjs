@@ -8,6 +8,8 @@ const site = process.env.SITE_URL || defaultSite;
 
 export default defineConfig({
   site,
+  // '/' en dominio propio; '/minchay-web' en la preview de GitHub Pages.
+  base: process.env.BASE_PATH || '/',
   output: 'static',
   trailingSlash: 'always',
   integrations: [
@@ -18,7 +20,8 @@ export default defineConfig({
         'astro:build:done': async ({ dir }) => {
           const file = new URL('robots.txt', dir);
           const template = await readFile(file, 'utf8');
-          const sitemapUrl = new URL('/sitemap-index.xml', site).href;
+          const basePath = (process.env.BASE_PATH || '').replace(/\/$/, '');
+          const sitemapUrl = new URL(`${basePath}/sitemap-index.xml`, site).href;
           await writeFile(file, template.replace(defaultSite + '/sitemap-index.xml', sitemapUrl));
         },
       },
