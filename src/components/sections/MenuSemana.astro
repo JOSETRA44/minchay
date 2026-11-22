@@ -1,17 +1,52 @@
 ---
-import { fotos } from '../../domain/fotos';
 import { menu } from '../../domain/menu';
-import EditorialPhoto from '../ui/EditorialPhoto.astro';
+import { ruta } from '../../lib/site';
 import Reveal from '../ui/Reveal.astro';
-import SectionHeading from '../ui/SectionHeading.astro';
+
+const escenas = [
+  { dia: menu[0], foto: ruta('/images/menu-pollo.webp'), comida: 'Almuerzo' },
+  { dia: menu[2], foto: ruta('/images/menu-calabaza.webp'), comida: 'Cena' },
+  { dia: menu[4], foto: ruta('/images/menu-pescado.webp'), comida: 'Almuerzo' },
+] as const;
 ---
-<section class="section menu-section" aria-labelledby="menu-title">
-  <div class="wrap">
-    <SectionHeading id="menu-title" title="Una semana en tu plato." label="Menú de ejemplo">
-      <p>Los platos rotan. Esta semana de ejemplo muestra el tipo de comida casera que encontrarás en Minchay.</p>
-    </SectionHeading>
+<section class="menu-section menu-story" id="menu-semana" aria-labelledby="menu-title" data-menu-story>
+  <div class="menu-runway" data-menu-runway>
+    <div class="menu-pin" data-menu-pin>
+      <header class="wrap menu-heading">
+        <div>
+          <p class="eyebrow">Menú de ejemplo</p>
+          <h2 id="menu-title">Una semana en tu plato.</h2>
+        </div>
+        <a href="#menu-completo">Ver el menú completo <span aria-hidden="true">↓</span></a>
+      </header>
+      <div class="menu-window" data-menu-window>
+        <ol class="menu-reel" role="list" id="menu-escenas" data-menu-reel>
+          {escenas.map(({ dia, foto, comida }) => (
+            <li class="menu-frame" data-menu-frame>
+              <div class="menu-image">
+                <img src={foto} width="1400" height="933" alt="" loading="lazy" decoding="async" data-menu-image />
+              </div>
+              <div class="menu-frame-copy">
+                <p class="eyebrow">{comida}</p>
+                <h3>{dia.dia}</h3>
+                <p>{comida === 'Almuerzo' ? dia.almuerzo : dia.cena}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+      <div class="wrap menu-chapters" data-menu-controls hidden>
+        <div class="menu-progress" aria-hidden="true"><span data-menu-progress></span></div>
+        <nav aria-label="Días del menú de ejemplo">
+          {escenas.map(({ dia }, index) => (
+            <button type="button" data-menu-jump aria-controls="menu-escenas" aria-current={index === 0 ? 'true' : undefined}>{dia.dia}</button>
+          ))}
+        </nav>
+      </div>
+    </div>
+  </div>
+  <div class="wrap menu-full" id="menu-completo">
     <Reveal>
-      <EditorialPhoto photo={fotos.menu} />
       <table class="menu-table">
         <caption>Semana tipo · De lunes a viernes</caption>
         <thead><tr><th scope="col">Día</th><th scope="col">Desayuno</th><th scope="col">Almuerzo</th><th scope="col">Cena</th></tr></thead>
@@ -24,3 +59,129 @@ import SectionHeading from '../ui/SectionHeading.astro';
     </Reveal>
   </div>
 </section>
+
+<script>
+  const story = document.querySelector<HTMLElement>('[data-menu-story]');
+  const runway = story?.querySelector<HTMLElement>('[data-menu-runway]');
+  const pin = story?.querySelector<HTMLElement>('[data-menu-pin]');
+  const windowEl = story?.querySelector<HTMLElement>('[data-menu-window]');
+  const reel = story?.querySelector<HTMLElement>('[data-menu-reel]');
+  const progressBar = story?.querySelector<HTMLElement>('[data-menu-progress]');
+  const controls = story?.querySelector<HTMLElement>('[data-menu-controls]');
+  const buttons = [...(story?.querySelectorAll<HTMLButtonElement>('[data-menu-jump]') ?? [])];
+  const frames = [...(story?.querySelectorAll<HTMLElement>('[data-menu-frame]') ?? [])];
+  const images = [...(story?.querySelectorAll<HTMLImageElement>('[data-menu-image]') ?? [])];
+
+  if (runway && pin && windowEl && reel && controls && frames.length > 1) {
+    const desktop = matchMedia('(min-width: 55rem) and (min-height: 38rem)');
+    const clamp = (value: number, max = 1) => Math.max(0, Math.min(max, value));
+    let scrollDistance = 0;
+    let stops: number[] = [];
+    let maxOffset = 0;
+    let request = 0;
+    let active = -1;
+
+    function update() {
+      request = 0;
+      const offset = desktop.matches
+        ? clamp(-(runway!.getBoundingClientRect().top) / (scrollDistance || 1)) * maxOffset
+        : clamp(windowEl!.scrollLeft, maxOffset);
+
+      if (desktop.matches) reel!.style.transform = `translate3d(${-offset}px, 0, 0)`;
+      progressBar?.style.setProperty('transform', `scaleX(${maxOffset ? offset / maxOffset : 0})`);
+      images.forEach((image, index) => {
+        const parallax = Math.max(-6, Math.min(6, (offset - stops[index]) * .014));
+        image.style.setProperty('--foto-x', `${parallax}%`);
+      });
+
+      const nearest = stops.reduce((best, stop, i) => Math.abs(offset - stop) < Math.abs(offset - stops[best]) ? i : best, 0);
+      if (nearest !== active) {
+        active = nearest;
+        buttons.forEach((button, index) => {
+          if (index === active) button.setAttribute('aria-current', 'true');
+          else button.removeAttribute('aria-current');
+        });
+      }
+    }
+
+    function queueUpdate() {
+      if (!request) request = requestAnimationFrame(update);
+    }
+
+    function measure() {
+      runway!.toggleAttribute('data-menu-sticky', desktop.matches);
+      if (desktop.matches) windowEl!.scrollLeft = 0;
+      else reel!.style.removeProperty('transform');
+      maxOffset = Math.max(0, reel!.scrollWidth - windowEl!.clientWidth);
+      const firstLeft = frames[0].offsetLeft;
+      stops = frames.map((frame) => clamp(frame.offsetLeft - firstLeft, maxOffset));
+      scrollDistance = desktop.matches ? Math.round(maxOffset * .9) : 0;
+      runway!.style.setProperty('--menu-travel', `${scrollDistance}px`);
+      queueUpdate();
+    }
+
+    controls.hidden = false;
+    buttons.forEach((button, index) => button.addEventListener('click', () => {
+      if (desktop.matches) {
+        const top = scrollY + runway.getBoundingClientRect().top;
+        scrollTo({ top: top + (maxOffset ? stops[index] / maxOffset : 0) * scrollDistance, behavior: 'smooth' });
+      } else {
+        windowEl.scrollTo({ left: stops[index], behavior: 'smooth' });
+      }
+    }));
+    addEventListener('scroll', queueUpdate, { passive: true });
+    addEventListener('resize', measure);
+    windowEl.addEventListener('scroll', queueUpdate, { passive: true });
+    new ResizeObserver(measure).observe(pin);
+    measure();
+  }
+</script>
+
+<style>
+  .menu-story { --menu-gutter: max(var(--gutter), calc((100% - 96rem) / 2)); border-block-start: 1px solid var(--line); }
+  .menu-runway { position: relative; }
+  .menu-pin { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(1rem, 3vw, 2rem); padding-block: clamp(2rem, 5vw, 4.5rem) 1.5rem; }
+  .menu-heading { display: flex; align-items: end; justify-content: space-between; flex-wrap: wrap; gap: .75rem 2rem; }
+  .menu-heading .eyebrow { color: var(--accent); margin-block-end: .65rem; }
+  .menu-heading h2 { font-size: clamp(2.5rem, 6.4vw, 6.75rem); text-wrap: balance; }
+  .menu-heading a { font-size: .9rem; font-weight: 600; }
+  .menu-window { min-inline-size: 0; overflow-x: auto; padding-block-end: .45rem; scroll-snap-type: x mandatory; scroll-padding-inline: var(--gutter); scrollbar-color: var(--accent) var(--line); }
+  .menu-reel { position: relative; display: flex; gap: clamp(.9rem, 2vw, 2.25rem); list-style: none; padding: 0 var(--menu-gutter); }
+  .menu-frame {
+    position: relative;
+    flex: 0 0 min(83vw, 74rem);
+    min-inline-size: 0;
+    min-block-size: clamp(23rem, 62vw, 36rem);
+    overflow: hidden;
+    isolation: isolate;
+    display: grid;
+    align-items: end;
+    scroll-snap-align: start;
+    color: var(--cream);
+    background: #5e3b28;
+  }
+  .menu-image { position: absolute; z-index: -2; inset: 0; overflow: hidden; }
+  .menu-image img { inline-size: 100%; block-size: 100%; object-fit: cover; transform: translateX(var(--foto-x, 0%)) scale(1.15); }
+  .menu-frame:nth-child(2) img { object-position: center 58%; }
+  .menu-frame::after { content: ""; position: absolute; z-index: -1; inset: 0; background: linear-gradient(0deg, #1a110de8 0%, #1a110d9c 26%, #1a110d00 67%); }
+  .menu-frame-copy { padding: clamp(1.15rem, 4vw, 3.5rem); }
+  .menu-frame-copy h3 { font-size: clamp(2.9rem, 7.2vw, 7.5rem); text-wrap: initial; line-height: .9; }
+  .menu-frame-copy p:last-child { max-inline-size: 34ch; margin-block-start: .65rem; }
+  .menu-frame-copy .eyebrow { margin-block-end: .75rem; }
+  .menu-chapters:not([hidden]) { display: grid; gap: .35rem; }
+  .menu-progress { block-size: 2px; background: var(--line); }
+  .menu-progress span { display: block; block-size: 100%; background: var(--accent); transform-origin: left; transform: scaleX(0); }
+  .menu-chapters nav { display: flex; flex-wrap: wrap; gap: .1rem clamp(.5rem, 3vw, 2rem); }
+  .menu-chapters button { min-block-size: 2.75rem; padding: 0 .15rem; border: 0; color: var(--ink); background: transparent; cursor: pointer; font-size: .88rem; }
+  .menu-chapters button[aria-current] { color: var(--accent); font-weight: 600; text-decoration: underline; text-underline-offset: .3em; }
+  .menu-full { padding-block: 1rem var(--section-space); }
+  .menu-table { margin-block-start: 1rem; }
+
+  @media (min-width: 55rem) and (min-height: 38rem) {
+    .menu-runway[data-menu-sticky] { block-size: calc(100svh + var(--menu-travel, 0px)); }
+    .menu-runway[data-menu-sticky] .menu-pin { position: sticky; inset-block-start: 0; block-size: 100svh; grid-template-rows: auto minmax(0, 1fr) auto; padding-block: clamp(1.25rem, 5svh, 3.2rem) 1rem; }
+    .menu-runway[data-menu-sticky] .menu-window { overflow: clip; padding: 0; }
+    .menu-runway[data-menu-sticky] .menu-reel { block-size: 100%; will-change: transform; }
+    .menu-runway[data-menu-sticky] .menu-frame { min-block-size: 0; }
+  }
+</style>
