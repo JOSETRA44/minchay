@@ -1,0 +1,29 @@
+---
+import { planes } from '../../domain/planes';
+import { site } from '../../lib/site';
+import SectionHeading from '../ui/SectionHeading.astro';
+import Reveal from '../ui/Reveal.astro';
+interface Props { standalone?: boolean }
+const { standalone = false } = Astro.props;
+const PlanHeading = standalone ? 'h2' : 'h3';
+---
+<section class:list={['section plans-section', { 'page-intro': standalone }]} aria-labelledby="planes-title">
+  <div class="wrap">
+    <SectionHeading id="planes-title" title="Planes de suscripción" level={standalone ? 1 : 2}>
+      <p>Elige qué comidas quieres recibir y dónde encajan en tu semana.</p>
+    </SectionHeading>
+    <Reveal>
+      <div class="editorial-grid plan-grid">
+        {planes.map(({ id, nombre, descripcion, lugar }) => (
+          <article id={id}>
+            <p class="eyebrow">{lugar}</p>
+            <PlanHeading>{nombre}</PlanHeading>
+            <p>{descripcion}</p>
+            <p class="price">Precio de lanzamiento por confirmar</p>
+          </article>
+        ))}
+      </div>
+      <a class="button" href={site.waitlist}>{site.cta} <span aria-hidden="true">↗</span></a>
+    </Reveal>
+  </div>
+</section>

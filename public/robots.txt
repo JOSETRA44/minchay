@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://minchay.example/sitemap-index.xml

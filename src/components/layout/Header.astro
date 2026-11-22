@@ -1,0 +1,16 @@
+---
+import { site } from '../../lib/site';
+interface Props { path: string }
+const { path } = Astro.props;
+---
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="wordmark" href="/" aria-label="Minchay, inicio">minchay<span aria-hidden="true">.</span></a>
+    <nav aria-label="Principal">
+      <ul role="list">
+        {site.navigation.map(({ href, label }) => <li><a href={href} aria-current={href === path ? 'page' : undefined}>{label}</a></li>)}
+      </ul>
+    </nav>
+    <a class="header-cta" href={site.waitlist}>Lista de espera <span aria-hidden="true">↗</span></a>
+  </div>
+</header>

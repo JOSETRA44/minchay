@@ -1,0 +1,15 @@
+---
+import { site } from '../../lib/site';
+import WaitlistForm from '../ui/WaitlistForm.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+interface Props { withForm?: boolean }
+const { withForm = false } = Astro.props;
+---
+<section class="section waitlist" id={withForm ? 'lista-de-espera' : undefined} aria-labelledby="waitlist-title">
+  <div class:list={['wrap', { 'waitlist-grid': withForm }]}>
+    <SectionHeading id="waitlist-title" title="Lista de espera" label="Lanzamiento">
+      <p>Las primeras ciudades y zonas todavía están por confirmar. Indica dónde te gustaría recibir tus comidas y qué plan te interesa.</p>
+    </SectionHeading>
+    {withForm ? <WaitlistForm /> : <a class="button" href={site.waitlist}>{site.cta} <span aria-hidden="true">↗</span></a>}
+  </div>
+</section>

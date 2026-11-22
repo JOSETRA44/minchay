@@ -1,0 +1,37 @@
+---
+import { planes } from '../../domain/planes';
+---
+<form data-waitlist aria-describedby="waitlist-note">
+  <fieldset disabled>
+    <legend class="sr-only">Datos para la lista de espera</legend>
+    <label>Nombre <input name="nombre" autocomplete="name" required /></label>
+    <label>Correo electrónico <input type="email" name="correo" autocomplete="email" required /></label>
+    <label>Ciudad <input name="ciudad" autocomplete="address-level2" required /></label>
+    <label>Zona <input name="zona" placeholder="Barrio o distrito" /></label>
+    <label class="form-wide">Plan de interés
+      <select name="plan" required>
+        <option value="">Selecciona un plan</option>
+        {planes.map(({ id, nombre }) => <option value={id}>{nombre}</option>)}
+      </select>
+    </label>
+    <button class="button form-wide" type="submit">Apuntarme <span aria-hidden="true">↗</span></button>
+  </fieldset>
+  <p id="waitlist-note" class="form-note">Formulario de demostración. Los datos no se guardan ni se envían.</p>
+  <p class="form-status" role="status" aria-atomic="true"></p>
+  <noscript><p>Activa JavaScript para probar el formulario.</p></noscript>
+</form>
+<script>
+  document.querySelectorAll<HTMLFormElement>('[data-waitlist]').forEach((form) => {
+    const fields = form.querySelector('fieldset');
+    const status = form.querySelector<HTMLElement>('[role="status"]');
+    if (!fields || !status) return;
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      // TODO: Conectar a un endpoint de lista de espera y confirmar solo si se guarda el registro.
+      form.reset();
+      status.textContent = 'Recibido. Te escribiremos antes del lanzamiento en tu ciudad.';
+    });
+    fields.disabled = false;
+  });
+</script>

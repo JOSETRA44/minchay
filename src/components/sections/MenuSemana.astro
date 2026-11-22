@@ -1,0 +1,26 @@
+---
+import { fotos } from '../../domain/fotos';
+import { menu } from '../../domain/menu';
+import EditorialPhoto from '../ui/EditorialPhoto.astro';
+import Reveal from '../ui/Reveal.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+---
+<section class="section menu-section" aria-labelledby="menu-title">
+  <div class="wrap">
+    <SectionHeading id="menu-title" title="Una semana en tu plato." label="Menú de ejemplo">
+      <p>Los platos rotan. Esta semana de ejemplo muestra el tipo de comida casera que encontrarás en Minchay.</p>
+    </SectionHeading>
+    <Reveal>
+      <EditorialPhoto photo={fotos.menu} />
+      <table class="menu-table">
+        <caption>Semana tipo · De lunes a viernes</caption>
+        <thead><tr><th scope="col">Día</th><th scope="col">Desayuno</th><th scope="col">Almuerzo</th><th scope="col">Cena</th></tr></thead>
+        <tbody>
+          {menu.map(({ dia, desayuno, almuerzo, cena }) => (
+            <tr><th scope="row">{dia}</th><td>{desayuno}</td><td>{almuerzo}</td><td>{cena}</td></tr>
+          ))}
+        </tbody>
+      </table>
+    </Reveal>
+  </div>
+</section>

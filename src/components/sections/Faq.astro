@@ -1,0 +1,14 @@
+---
+import { faqs } from '../../domain/faqs';
+import SectionHeading from '../ui/SectionHeading.astro';
+interface Props { standalone?: boolean }
+const { standalone = false } = Astro.props;
+---
+<section class:list={['section', { 'page-intro': standalone }]} aria-labelledby="faq-title">
+  <div class="wrap faq-layout">
+    <SectionHeading id="faq-title" title="Preguntas frecuentes" level={standalone ? 1 : 2} />
+    <dl class="faq-list">
+      {faqs.map(({ pregunta, respuesta }) => <div><dt>{pregunta}</dt><dd>{respuesta}</dd></div>)}
+    </dl>
+  </div>
+</section>

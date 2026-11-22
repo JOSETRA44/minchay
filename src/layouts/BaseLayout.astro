@@ -1,0 +1,53 @@
+---
+import '@fontsource/archivo/latin-400.css';
+import '@fontsource/archivo/latin-600.css';
+import '@fontsource/fraunces/latin-600.css';
+import '../styles/global.css';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import { metadata, structuredData, type Page } from '../lib/seo';
+import { site } from '../lib/site';
+
+interface Props { page: Page }
+const { page } = Astro.props;
+const { title, description, path } = metadata[page];
+const base = Astro.site ?? Astro.url;
+const canonical = new URL(path, base);
+const image = new URL('/og.jpg', base);
+const schema = structuredData(page, base);
+---
+<!doctype html>
+<html lang={site.language}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical.href} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#FAF5EE" />
+    <meta name="robots" content={page === 'error' ? 'noindex, follow' : 'index, follow'} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:locale" content={site.locale} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical.href} />
+    <meta property="og:image" content={image.href} />
+    <meta property="og:image:alt" content="Minchay. Comida por suscripción." />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={image.href} />
+    <meta name="twitter:image:alt" content="Minchay. Comida por suscripción." />
+    {schema && <script is:inline type="application/ld+json" set:html={JSON.stringify(schema).replaceAll('<', '\\u003c')} />}
+  </head>
+  <body>
+    <a class="skip" href="#contenido">Saltar al contenido</a>
+    <Header path={path} />
+    <main id="contenido" tabindex="-1"><slot /></main>
+    <Footer />
+  </body>
+</html>

@@ -1,0 +1,15 @@
+---
+import { costes } from '../../domain/servicio';
+import Reveal from '../ui/Reveal.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+---
+<section class="section" aria-labelledby="costes-title">
+  <div class="wrap">
+    <SectionHeading id="costes-title" title="Por qué puede costar menos" />
+    <Reveal>
+      <ol class="editorial-grid numbered" role="list">
+        {costes.map(({ titulo, texto }) => <li><h3>{titulo}</h3><p>{texto}</p></li>)}
+      </ol>
+    </Reveal>
+  </div>
+</section>

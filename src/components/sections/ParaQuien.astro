@@ -1,0 +1,15 @@
+---
+import { planes } from '../../domain/planes';
+import SectionHeading from '../ui/SectionHeading.astro';
+import Reveal from '../ui/Reveal.astro';
+---
+<section class="section" aria-labelledby="lugares">
+  <div class="wrap">
+    <SectionHeading id="lugares" title="Donde pasas el día." label="Lugares de entrega" />
+    <Reveal>
+      <ul class="place-list" role="list">
+        {planes.map(({ id, lugar, nombre }) => <li><a href={'/planes/#' + id}><span>{lugar}</span><span>Plan {nombre.toLowerCase()} ↗</span></a></li>)}
+      </ul>
+    </Reveal>
+  </div>
+</section>
