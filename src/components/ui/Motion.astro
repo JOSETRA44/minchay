@@ -75,19 +75,23 @@
     const header = document.querySelector('.site-header');
     const manifiesto = document.querySelector('[data-manifiesto]');
     const frases = manifiesto ? [...manifiesto.querySelectorAll('[data-frase]')] : [];
+    const puntos = manifiesto ? [...manifiesto.querySelectorAll('[data-punto]')] : [];
     manifiesto?.classList.add('activo');
     const parallaxImages = [...document.querySelectorAll('img[data-parallax]')];
     let ticking = false;
     const update = () => {
       ticking = false;
       header?.classList.toggle('scrolled', window.scrollY > 12);
-      if (manifiesto) {
+      if (manifiesto && frases.length) {
         const rect = manifiesto.getBoundingClientRect();
         const travel = manifiesto.offsetHeight - window.innerHeight;
         const progress = travel > 0 ? Math.min(1, Math.max(0, -rect.top / travel)) : 1;
+        const actual = Math.min(frases.length - 1, Math.floor(progress * frases.length));
         frases.forEach((frase, i) => {
-          frase.classList.toggle('on', progress >= (i + 0.3) / frases.length);
+          frase.classList.toggle('on', i === actual);
+          frase.classList.toggle('past', i < actual);
         });
+        puntos.forEach((punto, i) => punto.classList.toggle('on', i === actual));
       }
       for (const img of parallaxImages) {
         const box = img.parentElement?.getBoundingClientRect();

@@ -238,17 +238,23 @@
 }
 
 @layer motion {
-  /* ——— Manifiesto: la pantalla se fija y las frases se encienden una a una
-     con el scroll, como las citas de la referencia pero en secuencia ——— */
+  /* ——— Manifiesto: pantalla fijada y UNA frase cada vez; la anterior sale
+     hacia arriba y la siguiente sube, como en las webs de scroll narrado ——— */
   .manifiesto { padding-block: 0; }
-  .manifiesto-track { block-size: 340vh; position: relative; }
-  .manifiesto-pin { position: sticky; top: 0; min-block-size: 100svh; display: flex; align-items: center; padding-block: 4rem; }
-  .manifiesto-eyebrow { color: #E59A7C; margin-block-end: 1.6rem; }
-  .manifiesto-texto { font: 500 clamp(1.6rem, 4.4vw, 3.3rem)/1.3 var(--serif); letter-spacing: -.015em; max-inline-size: 26em; }
-  .manifiesto .frase { display: block; margin-block-end: .4em; }
-  .manifiesto.activo .frase { opacity: .13; transform: translateY(.16em); transition: opacity .5s ease, transform .5s ease, color .5s ease; }
-  .manifiesto.activo .frase.on { opacity: 1; transform: none; }
+  .manifiesto-track { block-size: 420vh; position: relative; }
+  .manifiesto-pin { position: sticky; top: 0; min-block-size: 100svh; display: flex; align-items: center; }
+  .manifiesto-escena { position: relative; }
+  .manifiesto-texto { font: 500 clamp(2.1rem, 6vw, 4.4rem)/1.16 var(--serif); letter-spacing: -.02em; max-inline-size: 16em; }
+  .manifiesto .frase { display: block; }
+  .manifiesto.activo .manifiesto-texto { position: relative; min-block-size: 2.6em; }
+  .manifiesto.activo .frase { position: absolute; inset: 0 auto auto 0; inline-size: 100%; opacity: 0; transform: translateY(2.2rem); filter: blur(6px); transition: opacity .55s ease, transform .55s cubic-bezier(.2, .7, .2, 1), filter .55s ease, color .55s ease; pointer-events: none; }
+  .manifiesto.activo .frase.on { opacity: 1; transform: none; filter: none; }
+  .manifiesto.activo .frase.past { opacity: 0; transform: translateY(-2.2rem); filter: blur(6px); }
   .manifiesto.activo .frase.acento.on { color: #E59A7C; }
+  .manifiesto-puntos { display: none; }
+  .manifiesto.activo .manifiesto-puntos { display: flex; gap: .55rem; margin-block-start: 3rem; }
+  .manifiesto-puntos .punto { inline-size: 2.2rem; block-size: .26rem; background: rgba(250, 245, 238, .22); transition: background .4s ease; }
+  .manifiesto-puntos .punto.on { background: #E59A7C; }
 
   /* Aviso de scroll en el hero: una línea que cae, para invitar a bajar */
   .scroll-hint { grid-column: 1 / -1; display: flex; align-items: center; gap: .8rem; margin-block-start: 2.6rem; font: 700 .78rem/1 var(--sans); letter-spacing: .18em; text-transform: uppercase; color: var(--olive); }

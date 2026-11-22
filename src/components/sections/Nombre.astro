@@ -1,21 +1,23 @@
 ---
 const frases = [
-  { texto: 'Pensar qué comer tres veces al día, todos los días, también es un trabajo.' },
-  { texto: 'Minchay lo hace por ti.', acento: true },
-  { texto: 'Cocinamos por tandas, repartimos por rutas y tu comida llega a la hora que elegiste, donde estés.' },
+  { texto: '¿Otra vez pensando qué comer?' },
+  { texto: 'Minchay lo resuelve por ti.', acento: true },
+  { texto: 'Cocinamos. Repartimos. Llega a tu hora.' },
   { texto: 'Mincha, en quechua, es pasado mañana.' },
-  { texto: 'Nosotros cocinamos pensando en tu pasado mañana, para que tú no tengas que pensar en él.' },
+  { texto: 'Tú, a lo tuyo.', acento: true },
 ];
 ---
 <section class="section origin manifiesto" data-manifiesto aria-labelledby="nombre-title">
-  <h2 id="nombre-title" class="sr-only">Pasado mañana.</h2>
+  <h2 id="nombre-title" class="sr-only">La idea de Minchay, frase a frase.</h2>
   <div class="manifiesto-track">
     <div class="manifiesto-pin">
-      <div class="wrap">
-        <p class="eyebrow manifiesto-eyebrow">Nuestro nombre</p>
+      <div class="wrap manifiesto-escena">
         <p class="manifiesto-texto">
           {frases.map((frase) => <span class:list={['frase', { acento: frase.acento }]} data-frase>{frase.texto}</span>)}
         </p>
+        <div class="manifiesto-puntos" aria-hidden="true">
+          {frases.map(() => <span class="punto" data-punto></span>)}
+        </div>
       </div>
     </div>
   </div>
