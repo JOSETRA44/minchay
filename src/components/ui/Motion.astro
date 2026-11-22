@@ -3,8 +3,8 @@
 // intro con formas geométricas que se ensamblan, barrido de franjas verticales
 // sobre las fotos, revelado por máscara al hacer scroll, parallax leve y un
 // fundido ligado a la posición de scroll en la sección del nombre.
-// Todo es mejora progresiva: sin JS o con prefers-reduced-motion, el contenido
-// se ve completo y quieto.
+// Sin JS, el contenido se ve completo y quieto. Por decisión de la marca,
+// las animaciones se reproducen igual en todos los equipos.
 ---
 <div class="intro" aria-hidden="true">
   <div class="intro-mark">
@@ -17,17 +17,16 @@
 
 <script>
   const root = document.documentElement;
-  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Intro: se retira sola; la CSS también la oculta a los 1,6 s por seguridad.
   const intro = document.querySelector('.intro');
   if (intro) {
     const done = () => { intro.remove(); root.classList.remove('has-intro'); };
-    if (reduced || !root.classList.contains('has-intro')) intro.remove();
+    if (!root.classList.contains('has-intro')) intro.remove();
     else setTimeout(done, 1550);
   }
 
-  if (!reduced) {
+  {
     // Barrido de franjas sobre las fotos al entrar en pantalla.
     const photos = document.querySelectorAll('.photo');
     if ('IntersectionObserver' in window) {
@@ -71,19 +70,24 @@
       carousel.addEventListener('mouseleave', () => { paused = false; });
     }
 
-    // Scroll: cabecera con sombra, fundido ligado al scroll en «Pasado mañana»
-    // y parallax leve en las fotos marcadas. Un solo handler con rAF.
+    // Scroll: cabecera con sombra, manifiesto frase a frase ligado al
+    // scroll y parallax leve en las fotos marcadas. Un solo handler con rAF.
     const header = document.querySelector('.site-header');
-    const origin = document.querySelector('.origin');
+    const manifiesto = document.querySelector('[data-manifiesto]');
+    const frases = manifiesto ? [...manifiesto.querySelectorAll('[data-frase]')] : [];
+    manifiesto?.classList.add('activo');
     const parallaxImages = [...document.querySelectorAll('img[data-parallax]')];
     let ticking = false;
     const update = () => {
       ticking = false;
       header?.classList.toggle('scrolled', window.scrollY > 12);
-      if (origin) {
-        const rect = origin.getBoundingClientRect();
-        const progress = Math.min(1, Math.max(0, (window.innerHeight - rect.top) / (window.innerHeight * 0.9)));
-        origin.style.setProperty('--sp', progress.toFixed(3));
+      if (manifiesto) {
+        const rect = manifiesto.getBoundingClientRect();
+        const travel = manifiesto.offsetHeight - window.innerHeight;
+        const progress = travel > 0 ? Math.min(1, Math.max(0, -rect.top / travel)) : 1;
+        frases.forEach((frase, i) => {
+          frase.classList.toggle('on', progress >= (i + 0.3) / frases.length);
+        });
       }
       for (const img of parallaxImages) {
         const box = img.parentElement?.getBoundingClientRect();

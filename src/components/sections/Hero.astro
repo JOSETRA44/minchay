@@ -17,6 +17,7 @@ import { site, ruta } from '../../lib/site';
       {heroSlides.map((slide, i) => <img {...slide} class:list={['slide', { active: i === 0 }]} data-carousel-slide loading={i === 0 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : undefined} decoding="async" />)}
       <span class="wipe" aria-hidden="true">{[0, 1, 2, 3, 4].map((i) => <i style={`--d:${(i * 0.06).toFixed(2)}s`}></i>)}</span>
     </div>
+    <p class="scroll-hint" aria-hidden="true"><i></i>Desliza</p>
     <div class="carousel-dots" aria-hidden="true">{heroSlides.map((_, i) => <span class:list={['dot-seg', { active: i === 0 }]} data-carousel-dot></span>)}</div>
   </div>
 </section>

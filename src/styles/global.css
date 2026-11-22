@@ -149,10 +149,6 @@
     .waitlist fieldset { grid-template-columns: minmax(0, 1fr); }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    [data-reveal] { transition: none; }
-    .reveal-pending:not(:focus-within) { opacity: 1; transform: none; }
-  }
 }
 
 @layer motion {
@@ -212,9 +208,6 @@
     .plan-grid { padding-block-end: 1.75rem; }
   }
 
-  /* ——— Fundido ligado al scroll en «Pasado mañana», como las citas de la referencia ——— */
-  .origin h2 { opacity: calc(.28 + .72 * var(--sp, 1)); transform: translateY(calc((1 - var(--sp, 1)) * 14px)); }
-  .origin p { opacity: calc(.45 + .55 * var(--sp, 1)); }
 
   /* ——— Botón: panel que barre al pasar el cursor (inversión por barrido) ——— */
   .button { position: relative; overflow: hidden; isolation: isolate; transition: color .3s ease; }
@@ -225,16 +218,6 @@
   .site-header { transition: box-shadow .3s ease; }
   .site-header.scrolled { box-shadow: 0 1px 0 var(--line), 0 14px 34px rgba(32, 23, 19, .08); }
 
-  @media (prefers-reduced-motion: reduce) {
-    .intro { display: none !important; }
-    .wipe { display: none; }
-    [data-reveal], [data-reveal] * { transition: none !important; }
-    .reveal-pending:not(:focus-within) { opacity: 1; transform: none; }
-    .reveal-pending :is(.editorial-grid > *, .place-list li, .faq-list > div) { clip-path: none; }
-    .reveal-pending * { opacity: 1 !important; transform: none !important; }
-    .origin h2, .origin p { opacity: 1; transform: none; }
-    html.has-intro .hero * { animation: none !important; }
-  }
 }
 
 @layer motion {
@@ -252,8 +235,23 @@
   .reveal-pending:not(:focus-within) { transform: translateY(2.6rem); }
   .reveal-pending :is(.editorial-grid > *, .place-list li) { transform: translateY(1.6rem); }
 
-  @media (prefers-reduced-motion: reduce) {
-    .hero-photo .slide { transition: none; }
-    .dot-seg { transition: none; }
-  }
+}
+
+@layer motion {
+  /* ——— Manifiesto: la pantalla se fija y las frases se encienden una a una
+     con el scroll, como las citas de la referencia pero en secuencia ——— */
+  .manifiesto { padding-block: 0; }
+  .manifiesto-track { block-size: 340vh; position: relative; }
+  .manifiesto-pin { position: sticky; top: 0; min-block-size: 100svh; display: flex; align-items: center; padding-block: 4rem; }
+  .manifiesto-eyebrow { color: #E59A7C; margin-block-end: 1.6rem; }
+  .manifiesto-texto { font: 500 clamp(1.6rem, 4.4vw, 3.3rem)/1.3 var(--serif); letter-spacing: -.015em; max-inline-size: 26em; }
+  .manifiesto .frase { display: block; margin-block-end: .4em; }
+  .manifiesto.activo .frase { opacity: .13; transform: translateY(.16em); transition: opacity .5s ease, transform .5s ease, color .5s ease; }
+  .manifiesto.activo .frase.on { opacity: 1; transform: none; }
+  .manifiesto.activo .frase.acento.on { color: #E59A7C; }
+
+  /* Aviso de scroll en el hero: una línea que cae, para invitar a bajar */
+  .scroll-hint { grid-column: 1 / -1; display: flex; align-items: center; gap: .8rem; margin-block-start: 2.6rem; font: 700 .78rem/1 var(--sans); letter-spacing: .18em; text-transform: uppercase; color: var(--olive); }
+  .scroll-hint i { display: block; inline-size: 2px; block-size: 2.6rem; background: var(--accent); transform-origin: top; animation: hint-drop 1.9s cubic-bezier(.7, 0, .2, 1) infinite; }
+  @keyframes hint-drop { 0% { transform: scaleY(0); } 45% { transform: scaleY(1); transform-origin: top; } 55% { transform-origin: bottom; transform: scaleY(1); } 100% { transform-origin: bottom; transform: scaleY(0); } }
 }
