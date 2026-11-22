@@ -11,7 +11,7 @@
   :root {
     --cream: #FAF5EE;
     --ink: #201713;
-    --accent: #B3401E;
+    --accent: #A8381A;
     --olive: #5B6236;
     --line: #E5DCCF;
     --paper: #F2E8DB;
@@ -108,6 +108,7 @@
   .plan-grid .eyebrow { color: var(--olive); margin-block-end: .9rem; }
   .plan-grid .price { margin-block-start: auto; padding-block-start: 1.25rem; font-size: .85rem; color: var(--accent); font-weight: 600; }
   .origin { color: var(--cream); background: var(--ink); }
+  .razones { background: var(--paper); }
   .origin h2 { font-size: clamp(3rem, 10.5vw, 11rem); text-wrap: initial; }
   .origin p { margin-block-start: 1.15rem; }
   .faq-layout { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.15fr); gap: 0 clamp(2rem, 6vw, 7rem); }
@@ -246,7 +247,7 @@
   .manifiesto-escena { position: relative; }
   .manifiesto-texto { font: 500 clamp(2.1rem, 6vw, 4.4rem)/1.16 var(--serif); letter-spacing: -.02em; max-inline-size: 16em; }
   .manifiesto .frase { display: block; }
-  .manifiesto.activo .manifiesto-texto { position: relative; min-block-size: 2.6em; }
+  .manifiesto.activo .manifiesto-texto { position: relative; min-block-size: 5em; }
   .manifiesto.activo .frase { position: absolute; inset: 0 auto auto 0; inline-size: 100%; opacity: 0; transform: translateY(2.2rem); filter: blur(6px); transition: opacity .55s ease, transform .55s cubic-bezier(.2, .7, .2, 1), filter .55s ease, color .55s ease; pointer-events: none; }
   .manifiesto.activo .frase.on { opacity: 1; transform: none; filter: none; }
   .manifiesto.activo .frase.past { opacity: 0; transform: translateY(-2.2rem); filter: blur(6px); }
@@ -255,6 +256,22 @@
   .manifiesto.activo .manifiesto-puntos { display: flex; gap: .55rem; margin-block-start: 3rem; }
   .manifiesto-puntos .punto { inline-size: 2.2rem; block-size: .26rem; background: rgba(250, 245, 238, .22); transition: background .4s ease; }
   .manifiesto-puntos .punto.on { background: #E59A7C; }
+
+  /* Icono de línea por frase: vapor que sube, check que se dibuja, aguja que
+     gira, rayos que pulsan y chispa que rota. Solo se mueven en su frase. */
+  .frase-icono { display: block; inline-size: clamp(3.2rem, 7vw, 4.4rem); block-size: auto; margin-block-end: 1.5rem; color: #E59A7C; }
+  .manifiesto.activo .frase.on .vapor { animation: vapor-sube 2.2s ease-in-out infinite; animation-delay: var(--vd, 0s); opacity: 0; }
+  @keyframes vapor-sube { 0% { opacity: 0; transform: translateY(2px); } 35% { opacity: .95; } 100% { opacity: 0; transform: translateY(-3px); } }
+  .manifiesto.activo .frase .trazo-circulo { stroke-dasharray: 110; stroke-dashoffset: 110; }
+  .manifiesto.activo .frase .trazo-check { stroke-dasharray: 30; stroke-dashoffset: 30; }
+  .manifiesto.activo .frase.on .trazo-circulo { stroke-dashoffset: 0; transition: stroke-dashoffset .7s ease; }
+  .manifiesto.activo .frase.on .trazo-check { stroke-dashoffset: 0; transition: stroke-dashoffset .5s ease .35s; }
+  .manifiesto.activo .frase.on .aguja { animation: aguja-gira 6s linear infinite; transform-origin: 24px 24px; transform-box: view-box; }
+  @keyframes aguja-gira { to { transform: rotate(360deg); } }
+  .manifiesto.activo .frase.on .rayo { animation: rayo-pulso 1.8s ease-in-out infinite alternate; animation-delay: var(--vd, 0s); }
+  @keyframes rayo-pulso { from { opacity: .35; } to { opacity: 1; } }
+  .manifiesto.activo .frase.on .chispa { animation: chispa-gira 10s linear infinite; transform-origin: 24px 24px; transform-box: view-box; }
+  @keyframes chispa-gira { to { transform: rotate(360deg); } }
 
   /* Aviso de scroll en el hero: una línea que cae, para invitar a bajar */
   .scroll-hint { grid-column: 1 / -1; display: flex; align-items: center; gap: .8rem; margin-block-start: 2.6rem; font: 700 .78rem/1 var(--sans); letter-spacing: .18em; text-transform: uppercase; color: var(--olive); }
