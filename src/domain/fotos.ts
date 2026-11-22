@@ -1,6 +1,7 @@
-const photo = (id: string) => `https://images.unsplash.com/${id}?q=80&w=1600&auto=format&fit=crop`;
-
+// Fotografía editorial servida desde el propio dominio: sin dependencias
+// externas en tiempo de carga, con dimensiones reales para evitar saltos
+// de maquetación. Origen: Unsplash (photo-1546069901 y photo-1541519227354).
 export const fotos = {
-  hero: { src: photo('photo-1546069901-ba9599a7e63c'), alt: 'Cuenco de ensalada con verduras variadas visto desde arriba', width: 1600, height: 1067 },
-  menu: { src: photo('photo-1541519227354-08fa5d50c44d'), alt: 'Tostadas de aguacate con semillas servidas en un plato', width: 1600, height: 1067 },
+  hero: { src: '/images/hero.jpg', alt: 'Cuenco de ensalada con verduras variadas visto desde arriba', width: 1600, height: 1600 },
+  menu: { src: '/images/menu.jpg', alt: 'Tostadas de aguacate con semillas servidas en un plato', width: 1600, height: 1064 },
 } as const;
