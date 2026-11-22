@@ -7,7 +7,7 @@ import { horarios } from '../../domain/horarios';
       <h2 id="horarios-title">Tu día, a tu hora.</h2>
       <p>Horarios de ejemplo, programables.</p>
     </div>
-    <ul role="list">
+    <ul role="list" data-reveal>
       {horarios.map(({ comida, hora, datetime }) => <li><time datetime={datetime}>{hora}</time><span>{comida}</span></li>)}
     </ul>
   </div>

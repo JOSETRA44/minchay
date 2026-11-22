@@ -1,14 +1,13 @@
 ---
 import '@fontsource/archivo/latin-400.css';
 import '@fontsource/archivo/latin-600.css';
-import '@fontsource/archivo/latin-700.css';
-import '@fontsource/archivo/latin-800.css';
-import '@fontsource/archivo/latin-900.css';
+import '@fontsource/fraunces/latin-600.css';
 import '../styles/global.css';
 import Header from '../components/layout/Header.astro';
 import Footer from '../components/layout/Footer.astro';
 import { metadata, structuredData, type Page } from '../lib/seo';
 import { site, ruta } from '../lib/site';
+import Motion from '../components/ui/Motion.astro';
 
 interface Props { page: Page }
 const { page } = Astro.props;
@@ -23,11 +22,12 @@ const schema = structuredData(page, base);
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>try{if(!sessionStorage.getItem('minchay-intro')&&!matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('has-intro');sessionStorage.setItem('minchay-intro','1')}}catch(e){}</script>
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical.href} />
     <link rel="icon" href={ruta('/favicon.svg')} type="image/svg+xml" />
-    <meta name="theme-color" content="#0B0B0B" />
+    <meta name="theme-color" content="#FAF5EE" />
     <meta name="robots" content={page === 'error' ? 'noindex, follow' : 'index, follow'} />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.name} />
@@ -51,5 +51,6 @@ const schema = structuredData(page, base);
     <Header path={path} />
     <main id="contenido" tabindex="-1"><slot /></main>
     <Footer />
+    <Motion />
   </body>
 </html>

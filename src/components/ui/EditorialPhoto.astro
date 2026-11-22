@@ -6,5 +6,6 @@ interface Props {
 const { photo, eager = false } = Astro.props;
 ---
 <div class="photo">
-  <img {...photo} data-editorial-photo loading={eager ? 'eager' : 'lazy'} fetchpriority={eager ? 'high' : undefined} decoding="async" />
+  <img {...photo} data-editorial-photo data-parallax loading={eager ? 'eager' : 'lazy'} fetchpriority={eager ? 'high' : undefined} decoding="async" />
+  <span class="wipe" aria-hidden="true">{[0, 1, 2, 3, 4].map((i) => <i style={`--d:${(i * 0.06).toFixed(2)}s`}></i>)}</span>
 </div>

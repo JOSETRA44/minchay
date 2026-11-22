@@ -1,0 +1,72 @@
+---
+// Sistema de movimiento de Minchay, tomado del lenguaje de designcanada.com:
+// intro con formas geométricas que se ensamblan, barrido de franjas verticales
+// sobre las fotos, revelado por máscara al hacer scroll, parallax leve y un
+// fundido ligado a la posición de scroll en la sección del nombre.
+// Todo es mejora progresiva: sin JS o con prefers-reduced-motion, el contenido
+// se ve completo y quieto.
+---
+<div class="intro" aria-hidden="true">
+  <div class="intro-mark">
+    <span class="intro-shape intro-circle"></span>
+    <span class="intro-shape intro-semi"></span>
+    <span class="intro-shape intro-bar"></span>
+  </div>
+  <p class="intro-word">minchay<span>.</span></p>
+</div>
+
+<script>
+  const root = document.documentElement;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Intro: se retira sola; la CSS también la oculta a los 1,6 s por seguridad.
+  const intro = document.querySelector('.intro');
+  if (intro) {
+    const done = () => { intro.remove(); root.classList.remove('has-intro'); };
+    if (reduced || !root.classList.contains('has-intro')) intro.remove();
+    else setTimeout(done, 1550);
+  }
+
+  if (!reduced) {
+    // Barrido de franjas sobre las fotos al entrar en pantalla.
+    const photos = document.querySelectorAll('.photo');
+    if ('IntersectionObserver' in window) {
+      const photoObserver = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          entry.target.classList.add('in');
+          photoObserver.unobserve(entry.target);
+        }
+      }, { threshold: 0.25 });
+      photos.forEach((photo) => photoObserver.observe(photo));
+    } else {
+      photos.forEach((photo) => photo.classList.add('in'));
+    }
+
+    // Scroll: cabecera con sombra, fundido ligado al scroll en «Pasado mañana»
+    // y parallax leve en las fotos marcadas. Un solo handler con rAF.
+    const header = document.querySelector('.site-header');
+    const origin = document.querySelector('.origin');
+    const parallaxImages = [...document.querySelectorAll('img[data-parallax]')];
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      header?.classList.toggle('scrolled', window.scrollY > 12);
+      if (origin) {
+        const rect = origin.getBoundingClientRect();
+        const progress = Math.min(1, Math.max(0, (window.innerHeight - rect.top) / (window.innerHeight * 0.9)));
+        origin.style.setProperty('--sp', progress.toFixed(3));
+      }
+      for (const img of parallaxImages) {
+        const box = img.parentElement?.getBoundingClientRect();
+        if (!box || box.bottom < 0 || box.top > window.innerHeight) continue;
+        const offset = (box.top + box.height / 2 - window.innerHeight / 2) * -0.045;
+        img.style.transform = `translateY(${offset.toFixed(1)}px) scale(1.14)`;
+      }
+    };
+    addEventListener('scroll', () => {
+      if (!ticking) { ticking = true; requestAnimationFrame(update); }
+    }, { passive: true });
+    update();
+  }
+</script>
