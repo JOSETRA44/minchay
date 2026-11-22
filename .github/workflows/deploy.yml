@@ -18,7 +18,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      SITE_URL: https://JOSETRA44.github.io
+      SITE_URL: https://chaupimayo.com
       BASE_PATH: /minchay-web
     steps:
       - uses: actions/checkout@v4
