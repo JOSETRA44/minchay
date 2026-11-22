@@ -1,14 +1,135 @@
 ---
 import { horarios } from '../../domain/horarios';
 ---
-<section class="schedule" aria-labelledby="horarios-title">
-  <div class="wrap schedule-inner">
-    <div>
-      <h2 id="horarios-title">Tu día, a tu hora.</h2>
-      <p>Horarios de ejemplo, programables.</p>
+<section class="day-story" id="horarios" aria-labelledby="horarios-title" data-day-story>
+  <div class="wrap">
+    <header class="day-intro">
+      <h2 id="horarios-title">Tu día, <em>a tu hora.</em></h2>
+      <p>Desayuno, almuerzo y cena. Estos son horarios de ejemplo: tú eliges los tuyos.</p>
+    </header>
+    <div class="day-layout">
+      <div class="day-stage" aria-hidden="true">
+        <div class="day-film">
+          {horarios.map(({ foto }) => (
+            <img {...foto} alt="" data-day-frame data-editorial-photo loading="lazy" decoding="async" />
+          ))}
+        </div>
+        <div class="day-meter"><span data-day-meter></span></div>
+      </div>
+      <ol class="day-list" role="list">
+        {horarios.map(({ comida, hora, datetime, foto }) => (
+          <li class="day-meal" data-day-meal>
+            <div class="day-copy">
+              <time datetime={datetime}>{hora}</time>
+              <h3>{comida}</h3>
+            </div>
+            <div class="day-still">
+              <img {...foto} data-editorial-photo loading="lazy" decoding="async" />
+            </div>
+          </li>
+        ))}
+      </ol>
     </div>
-    <ul role="list" data-reveal>
-      {horarios.map(({ comida, hora, datetime }) => <li><time datetime={datetime}>{hora}</time><span>{comida}</span></li>)}
-    </ul>
   </div>
 </section>
+
+<style>
+  .day-story {
+    --night: #251914;
+    --light: #fbefe2;
+    --warm: #f3a88c;
+    --rule: #6d4c3e;
+    padding-block: clamp(3.25rem, 8vw, 8rem);
+    background: var(--night);
+    color: var(--light);
+  }
+  .day-intro {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+    padding-block-end: clamp(1.5rem, 4vw, 3rem);
+    border-block-end: 1px solid var(--rule);
+  }
+  .day-intro h2 { font-size: clamp(2.75rem, 7.1vw, 8rem); }
+  .day-intro h2 em { color: var(--warm); font-style: normal; }
+  .day-intro p { max-inline-size: 29ch; }
+  .day-stage { display: none; }
+  .day-list { list-style: none; padding: 0; }
+  .day-meal { padding-block: 1.5rem; border-block-end: 1px solid var(--rule); }
+  .day-copy { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+  .day-copy time {
+    color: var(--warm);
+    font: 600 clamp(2.55rem, 10vw, 4.75rem)/.93 var(--serif);
+    letter-spacing: -.06em;
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+  .day-copy h3 { font-size: clamp(1.3rem, 5.8vw, 2.3rem); }
+  .day-still { aspect-ratio: 1.55; overflow: hidden; margin-block-start: 1rem; background: #614234; }
+  .day-still img { inline-size: 100%; block-size: 100%; object-fit: cover; }
+  .day-story .is-unavailable { opacity: 0; }
+
+  @media (min-width: 54rem) {
+    .day-meal {
+      display: grid;
+      grid-template-columns: minmax(0, .65fr) minmax(0, 1fr);
+      align-items: center;
+      gap: 2rem;
+    }
+    .day-copy { display: block; }
+    .day-copy h3 { margin-block-start: .65rem; }
+    .day-still { margin: 0; }
+  }
+
+  @media (min-width: 54rem) and (min-height: 34rem) {
+    .day-story[data-cinematic] .day-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+      gap: clamp(2rem, 5.5vw, 6rem);
+    }
+    .day-story[data-cinematic] .day-stage {
+      position: sticky;
+      inset-block-start: 8svh;
+      align-self: start;
+      display: block;
+      margin-block: clamp(1.5rem, 4vw, 3rem);
+    }
+    .day-film {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      block-size: min(67svh, 44rem);
+      background: #614234;
+    }
+    .day-film img {
+      position: absolute;
+      inset: 0;
+      inline-size: 100%;
+      block-size: 100%;
+      object-fit: cover;
+    }
+    .day-film img:not(:first-child) { opacity: 0; }
+    .day-meter { block-size: 2px; margin-block-start: 1rem; background: var(--rule); }
+    .day-meter span { display: block; block-size: 100%; background: var(--warm); transform: scaleX(0); transform-origin: left; }
+    .day-story[data-cinematic] .day-meal {
+      display: flex;
+      min-block-size: max(55svh, 19rem);
+      align-items: center;
+    }
+    .day-story[data-cinematic] .day-copy time { font-size: clamp(4rem, 10vw, 10rem); }
+    .day-story[data-cinematic] .day-copy h3 { font-size: clamp(2rem, 3.6vw, 4rem); }
+    .day-story[data-cinematic] .day-still { display: none; }
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (max-width: 53.99rem) {
+      .day-still img {
+        animation: slide-into-frame linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 100%;
+      }
+      @keyframes slide-into-frame { from { transform: scale(1.09); } }
+    }
+  }
+</style>
