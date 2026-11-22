@@ -196,8 +196,10 @@
   .photo img[data-parallax] { transform: scale(1.14); will-change: transform; }
 
   /* ——— Revelado al hacer scroll: máscara que se abre, no el fundido genérico ——— */
-  [data-reveal] { transition: opacity .55s ease, transform .7s cubic-bezier(.2, .7, .2, 1), clip-path .7s cubic-bezier(.7, 0, .2, 1); clip-path: inset(0 0 0 0); }
-  .reveal-pending:not(:focus-within) { opacity: 0; transform: translateY(1.6rem); clip-path: inset(0 0 100% 0); }
+  [data-reveal] { transition: opacity .55s ease, transform .7s cubic-bezier(.2, .7, .2, 1); }
+  .reveal-pending:not(:focus-within) { opacity: 0; transform: translateY(1.6rem); }
+  [data-reveal] :is(.editorial-grid > *, .place-list li, .faq-list > div) { clip-path: inset(0 0 0 0); transition: clip-path .7s cubic-bezier(.7, 0, .2, 1), opacity .5s ease, transform .6s cubic-bezier(.2, .7, .2, 1); }
+  .reveal-pending :is(.editorial-grid > *, .place-list li, .faq-list > div) { clip-path: inset(0 0 100% 0); }
   [data-reveal] :is(.editorial-grid > *, .place-list li, .schedule li) { transition: opacity .5s ease, transform .6s cubic-bezier(.2, .7, .2, 1); }
   .reveal-pending :is(.editorial-grid > *, .place-list li) { opacity: 0; transform: translateY(1rem); }
   .reveal-pending .schedule li { opacity: 0; transform: translateX(-.9rem); }
@@ -227,7 +229,8 @@
     .intro { display: none !important; }
     .wipe { display: none; }
     [data-reveal], [data-reveal] * { transition: none !important; }
-    .reveal-pending:not(:focus-within) { opacity: 1; transform: none; clip-path: none; }
+    .reveal-pending:not(:focus-within) { opacity: 1; transform: none; }
+    .reveal-pending :is(.editorial-grid > *, .place-list li, .faq-list > div) { clip-path: none; }
     .reveal-pending * { opacity: 1 !important; transform: none !important; }
     .origin h2, .origin p { opacity: 1; transform: none; }
     html.has-intro .hero * { animation: none !important; }

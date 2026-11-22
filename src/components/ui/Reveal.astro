@@ -12,13 +12,35 @@
         if (!entry.isIntersecting) continue;
         entry.target.classList.remove('reveal-pending');
         observer.unobserve(entry.target);
+        pending.delete(entry.target);
       }
     }, { threshold: 0.05 });
 
+    const pending = new Set<Element>();
     document.querySelectorAll('[data-reveal]').forEach((element) => {
       if (element.getBoundingClientRect().top <= window.innerHeight) return;
       element.classList.add('reveal-pending');
+      pending.add(element);
       observer.observe(element);
     });
+
+    // Red de seguridad: si el observador no se dispara en algún navegador,
+    // el propio scroll revela lo que entre en pantalla, y a los 4 s se
+    // revela todo lo que esté a menos de dos pantallas de distancia.
+    const revealNear = () => {
+      for (const element of pending) {
+        if (element.getBoundingClientRect().top > window.innerHeight * 1.15) continue;
+        element.classList.remove('reveal-pending');
+        observer.unobserve(element);
+        pending.delete(element);
+      }
+    };
+    let ticking = false;
+    addEventListener('scroll', () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => { ticking = false; revealNear(); });
+    }, { passive: true });
+    setTimeout(revealNear, 4000);
   }
 </script>
