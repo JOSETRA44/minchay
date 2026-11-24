@@ -14,8 +14,8 @@ import { site, ruta } from '../../lib/site';
   </div>
   <div class="hero-reel" data-carousel>
     <div class="photo hero-photo" id="hero-photos">
-      {heroSlides.map(({ src, alt, width, height }, i) => (
-        <img src={src} alt={alt} width={width} height={height} class={i === 0 ? 'slide active' : 'slide'} data-carousel-slide aria-hidden={i === 0 ? undefined : 'true'} loading={i === 0 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : undefined} />
+      {heroSlides.map(({ src, srcset, sizes, alt, width, height }, i) => (
+        <img src={src} srcset={srcset} sizes={sizes} alt={alt} width={width} height={height} class={i === 0 ? 'slide active' : 'slide'} data-carousel-slide aria-hidden={i === 0 ? undefined : 'true'} loading={i === 0 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : undefined} />
       ))}
       <span class="wipe" aria-hidden="true">{[0, 1, 2, 3, 4].map((i) => <i style={`--d:${(i * 0.06).toFixed(2)}s`}></i>)}</span>
     </div>

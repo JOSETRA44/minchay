@@ -108,6 +108,26 @@
     const frases = manifiesto ? [...manifiesto.querySelectorAll('[data-frase]')] : [];
     const puntos = manifiesto ? [...manifiesto.querySelectorAll('[data-punto]')] : [];
     manifiesto?.classList.add('activo');
+
+    // Botón flotante (solo CSS lo muestra en pantallas pequeñas): aparece
+    // tras pasar el hero y se retira cuando el formulario ya está a la vista.
+    const ctaFlotante = document.querySelector<HTMLElement>('[data-cta-flotante]');
+    if (ctaFlotante) {
+      const formLocal = document.getElementById('lista-de-espera');
+      if (formLocal) ctaFlotante.setAttribute('href', '#lista-de-espera');
+      let formVisible = false;
+      const updateCta = () => {
+        ctaFlotante.classList.toggle('visible', window.scrollY > window.innerHeight * 0.85 && !formVisible);
+      };
+      if (formLocal && 'IntersectionObserver' in window) {
+        new IntersectionObserver((entries) => {
+          formVisible = entries[0].isIntersecting;
+          updateCta();
+        }).observe(formLocal);
+      }
+      addEventListener('scroll', updateCta, { passive: true });
+      updateCta();
+    }
     const parallaxImages = [...document.querySelectorAll('img[data-parallax]')];
     const story = document.querySelector<HTMLElement>('[data-day-story]');
     const cinematicLayout = matchMedia('(min-width: 54rem) and (min-height: 34rem)');

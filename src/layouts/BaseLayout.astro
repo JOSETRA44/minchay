@@ -51,6 +51,7 @@ const schema = structuredData(page, base);
     <Header path={path} />
     <main id="contenido" tabindex="-1"><slot /></main>
     <Footer />
+    <a class="cta-flotante" href={ruta('/#lista-de-espera')} data-cta-flotante>Quiero entrar en la lista de espera</a>
     <Motion />
   </body>
 </html>
