@@ -1,7 +1,11 @@
 ---
 import { planes } from '../../domain/planes';
+
+// Clave pública de Web3Forms: está hecha para ir en el código del cliente y
+// entrega cada registro en el correo de Minchay (cuenta de Rosy).
+const WEB3FORMS_KEY = '2f66ee8e-3046-47c0-95c3-3808b4d0c525';
 ---
-<form data-waitlist aria-describedby="waitlist-note">
+<form data-waitlist data-key={WEB3FORMS_KEY} aria-describedby="waitlist-note">
   <fieldset disabled>
     <legend class="sr-only">Datos para la lista de espera</legend>
     <label>Nombre <input name="nombre" autocomplete="name" required /></label>
@@ -14,23 +18,58 @@ import { planes } from '../../domain/planes';
         {planes.map(({ id, nombre }) => <option value={id}>{nombre}</option>)}
       </select>
     </label>
+    <input type="checkbox" name="botcheck" class="sr-only" tabindex="-1" autocomplete="off" aria-hidden="true" />
     <button class="button form-wide" type="submit">Apuntarme <span aria-hidden="true">↗</span></button>
   </fieldset>
-  <p id="waitlist-note" class="form-note">Formulario de demostración. Los datos no se guardan ni se envían.</p>
+  <p id="waitlist-note" class="form-note">Tus datos llegan al correo de Minchay. Solo te escribiremos sobre el lanzamiento en tu ciudad.</p>
   <p class="form-status" role="status" aria-atomic="true"></p>
-  <noscript><p>Activa JavaScript para probar el formulario.</p></noscript>
+  <noscript><p>Activa JavaScript para enviar el formulario.</p></noscript>
 </form>
 <script>
   document.querySelectorAll<HTMLFormElement>('[data-waitlist]').forEach((form) => {
     const fields = form.querySelector('fieldset');
     const status = form.querySelector<HTMLElement>('[role="status"]');
-    if (!fields || !status) return;
+    const button = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+    if (!fields || !status || !button) return;
 
-    form.addEventListener('submit', (event) => {
+    form.addEventListener('submit', async (event) => {
       event.preventDefault();
-      // TODO: Conectar a un endpoint de lista de espera y confirmar solo si se guarda el registro.
-      form.reset();
-      status.textContent = 'Recibido. Te escribiremos antes del lanzamiento en tu ciudad.';
+      const datos = new FormData(form);
+      if (datos.get('botcheck')) return;
+      const planSelect = form.querySelector<HTMLSelectElement>('select[name="plan"]');
+      const planTexto = planSelect?.options[planSelect.selectedIndex]?.text ?? '';
+
+      fields.disabled = true;
+      const textoOriginal = button.innerHTML;
+      button.innerHTML = 'Enviando…';
+      status.textContent = '';
+
+      try {
+        const respuesta = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({
+            access_key: form.dataset.key,
+            subject: 'Nueva inscripción en la lista de espera — Minchay',
+            from_name: 'Web de Minchay',
+            replyto: datos.get('correo'),
+            nombre: datos.get('nombre'),
+            correo: datos.get('correo'),
+            ciudad: datos.get('ciudad'),
+            zona: datos.get('zona') || '—',
+            plan: planTexto,
+          }),
+        });
+        const resultado = await respuesta.json().catch(() => null);
+        if (!respuesta.ok || !resultado?.success) throw new Error('envío rechazado');
+        form.reset();
+        status.textContent = '¡Ya estás en la lista! Te escribiremos antes del lanzamiento en tu ciudad.';
+      } catch {
+        status.textContent = 'No se pudo enviar. Revisa tu conexión e inténtalo de nuevo.';
+      } finally {
+        fields.disabled = false;
+        button.innerHTML = textoOriginal;
+      }
     });
     fields.disabled = false;
   });
